@@ -1,8 +1,9 @@
 all: check build-debug doc test
+	@just compile-example idid5
 clean:
 	cargo clean
 watch TARGET="all":
-	watchexec -cre rs,toml "just {{TARGET}}"
+	watchexec -cre lalrpop,rs,toml "just {{TARGET}}"
 
 build: build-debug build-release
 build-debug:
@@ -21,5 +22,9 @@ test:
 
 outdated-deps:
 	cargo outdated -R
+
+compile-example NAME:
+	@mkdir -p target/examples
+	@just run examples/{{NAME}}.stlc -o target/examples/{{NAME}}.f
 run +ARGS="":
 	cargo run -- {{ARGS}}

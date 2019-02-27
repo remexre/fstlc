@@ -1,0 +1,1 @@
+(\x:int->int. x) (\x:int. x) 5
