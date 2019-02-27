@@ -10,14 +10,14 @@ extern crate lalrpop_util;
 lalrpop_mod!(grammar);
 mod tyck;
 
-use std::{rc::Rc, str::FromStr};
+use std::{str::FromStr, sync::Arc};
 
 #[derive(Debug, Display, Eq, PartialEq)]
 pub enum Expr {
     #[display(fmt = "({} {})", _0, _1)]
     App(Box<Expr>, Box<Expr>),
     #[display(fmt = "(\\{}:{}. {})", _0, _1, _2)]
-    Lam(String, Rc<Type>, Box<Expr>),
+    Lam(String, Arc<Type>, Box<Expr>),
     #[display(fmt = "{}", _0)]
     Lit(u32),
     #[display(fmt = "{}", _0)]
@@ -36,7 +36,7 @@ impl FromStr for Expr {
 #[derive(Debug, Display, Eq, PartialEq)]
 pub enum Type {
     #[display(fmt = "({}) -> {}", _0, _1)]
-    Arr(Rc<Type>, Rc<Type>),
+    Arr(Arc<Type>, Arc<Type>),
     #[display(fmt = "int")]
     Int,
 }

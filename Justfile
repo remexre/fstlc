@@ -1,5 +1,6 @@
 all: check build-debug doc test
 	@just compile-example idid5
+	@just compile-example plus
 clean:
 	cargo clean
 watch TARGET="all":

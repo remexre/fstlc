@@ -1,1 +1,1 @@
-(\x:int->int. x) (\x:int. x) 5
+(\x:int -> int. x) (\x:int. x) 5
