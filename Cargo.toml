@@ -1,0 +1,11 @@
+[package]
+name = "fstlc"
+version = "0.1.0"
+authors = ["Nathan Ringo <remexre@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+lalrpop-util = "0.16.3"
+
+[dev-dependencies]
+lalrpop = "0.16.3"
