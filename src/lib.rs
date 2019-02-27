@@ -7,10 +7,12 @@ extern crate derive_more;
 #[macro_use]
 extern crate lalrpop_util;
 
+mod compile;
 lalrpop_mod!(grammar);
 mod tyck;
 
-use std::{str::FromStr, sync::Arc};
+pub use crate::compile::Chunk;
+use std::{iter::once, str::FromStr, sync::Arc};
 
 #[derive(Debug, Display, Eq, PartialEq)]
 pub enum Expr {
@@ -22,6 +24,29 @@ pub enum Expr {
     Lit(u32),
     #[display(fmt = "{}", _0)]
     Var(String),
+}
+
+impl Expr {
+    /// Compiles an expression to Forth chunks.
+    pub fn compile(&self) -> Result<impl Iterator<Item = Chunk>, String> {
+        let mut scope = Vec::new();
+        let nameless = crate::compile::remove_names(&mut scope, self)?;
+        let mut hoist = Vec::new();
+        let mut depth = 0;
+        let main = crate::compile::compile(&nameless, &mut depth, &mut hoist);
+        hoist.push(("main".to_string(), main, depth));
+
+        Ok(hoist.into_iter().flat_map(|(name, body, depth)| {
+            once(Chunk::Def(name))
+                .chain(body)
+                .chain(if depth == 0 {
+                    None
+                } else {
+                    Some(Chunk::Discard(depth))
+                })
+                .chain(once(Chunk::EndDef))
+        }))
+    }
 }
 
 impl FromStr for Expr {

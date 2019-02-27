@@ -33,10 +33,14 @@ struct Options {
 fn run(options: Options) -> Result<(), Box<dyn Error>> {
     let src = read_to_string(options.input)?;
     let expr: Expr = src.parse()?;
-
-    println!("{}", expr);
     let ty = expr.tyck()?;
-    println!("{}", ty);
+    let chunks = expr.compile()?;
 
+    let mut forth = format!("\\ expr = {}\n\\ type = {}\n", expr, ty);
+    forth.extend(include_str!("prelude.f").chars());
+    forth.extend(itertools::join(chunks, " ").chars());
+    println!("{}", forth);
+
+    write(options.output, forth.as_bytes())?;
     Ok(())
 }

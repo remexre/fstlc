@@ -7,7 +7,8 @@ lazy_static::lazy_static! {
         ("-", &INT_TO_INT_TO_INT),
         ("*", &INT_TO_INT_TO_INT),
         ("/", &INT_TO_INT_TO_INT),
-        (".", &INT_TO_INT),
+        ("mod", &INT_TO_INT_TO_INT),
+        ("print", &INT_TO_INT),
     ];
     static ref INT: Arc<Type> = Arc::new(Type::Int);
     static ref INT_TO_INT: Arc<Type> = Arc::new(Type::Arr(INT.clone(), INT.clone()));
