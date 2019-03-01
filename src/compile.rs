@@ -11,7 +11,7 @@ pub enum Chunk {
     Print,
 
     /// Pushes a word's execution token to the stack. `( -- xt )`
-    #[display(fmt = "' {}", _0)]
+    #[display(fmt = "[ ' {} ] literal", _0)]
     Quoted(&'static str),
 
     /// Executes a word on the stack. `( i * x xt -- j * x )`
