@@ -9,10 +9,8 @@ pub enum StaticCombinator {
     #[display(fmt = "App")]
     App,
 
-    /// The composition combinator. `(xoy)z = x(yz)`
-    ///
-    /// TODO Unicode.
-    #[display(fmt = "{} o {}", _0, _1)]
+    /// The composition combinator. `(x∘y)z = x(yz)`
+    #[display(fmt = "{} ∘ {}", _0, _1)]
     Com(Box<StaticCombinator>, Box<StaticCombinator>),
 
     /// The `Fst` combinator. `Fst(x, y) = x`
@@ -41,22 +39,55 @@ pub enum StaticCombinator {
 }
 
 impl StaticCombinator {
-    /// Compiles a `StaticCombinator` to a sequence of Forth words.
-    pub fn to_forth(&self) -> Vec<String> {
+    /// Compiles a `StaticCombinator` to a sequence of Forth definitions. The names generated are
+    /// prefixed with the given string.
+    pub fn to_forth(&self, prefix: &str) -> Vec<Vec<String>> {
+        let mut decls = Vec::new();
+        let mut counter = 0;
+        let mut main = self.compile_to_forth(&mut decls, &mut || {
+            let name = format!("fstlc-lambda-{}-{}", prefix, counter);
+            counter += 1;
+            name
+        });
+        main.insert(0, "0".to_string());
+        decls.push((format!("fstlc-{}-main", prefix), main));
+        decls
+            .into_iter()
+            .map(|(name, mut words)| {
+                words.insert(0, name);
+                words.insert(0, ":".to_string());
+                words.push(";".to_string());
+                words
+            })
+            .collect()
+    }
+
+    /// Compiles a combinator to a chunk of Forth code, possibly adding global declarations while
+    /// doing so.
+    fn compile_to_forth(
+        &self,
+        hoisted: &mut Vec<(String, Vec<String>)>,
+        fresh_name: &mut impl FnMut() -> String,
+    ) -> Vec<String> {
         match *self {
             StaticCombinator::App => vec!["FSTLC-APP".to_string()],
             StaticCombinator::Com(ref l, ref r) => {
-                let mut v = r.to_forth();
-                v.extend(l.to_forth());
+                let mut v = r.compile_to_forth(hoisted, fresh_name);
+                v.extend(l.compile_to_forth(hoisted, fresh_name));
                 v
             }
             StaticCombinator::Fst => vec!["FSTLC-FST".to_string()],
-            StaticCombinator::Lam(ref b) => unimplemented!("Λ({})", b),
+            StaticCombinator::Lam(ref b) => {
+                let inner = b.compile_to_forth(hoisted, fresh_name);
+                let name = fresh_name();
+                hoisted.push((name.clone(), inner));
+                vec!["'".to_string(), name, "CFA".to_string()]
+            }
             StaticCombinator::Pair(ref l, ref r) => {
                 let mut v = vec!["DUP".to_string()];
-                v.extend(l.to_forth());
+                v.extend(l.compile_to_forth(hoisted, fresh_name));
                 v.push("SWAP".to_string());
-                v.extend(r.to_forth());
+                v.extend(r.compile_to_forth(hoisted, fresh_name));
                 v.push("FSTLC-MAKE-PAIR".to_string());
                 v
             }

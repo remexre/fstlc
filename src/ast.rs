@@ -5,7 +5,7 @@ pub enum Expr {
     #[display(fmt = "({} {})", _0, _1)]
     App(Box<Expr>, Box<Expr>),
 
-    #[display(fmt = "(\\{}:{}. {})", _0, _1, _2)]
+    #[display(fmt = "(λ{}:{}. {})", _0, _1, _2)]
     Lam(String, Arc<Type>, Box<Expr>),
 
     #[display(fmt = "{}", _0)]

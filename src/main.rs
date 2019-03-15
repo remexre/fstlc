@@ -25,20 +25,29 @@ struct Options {
     #[structopt(short = "o", long = "output", parse(from_os_str))]
     output: PathBuf,
 
-    /// The top-level name.
-    #[structopt(short = "n", long = "name", default_value = "main")]
-    name: String,
+    /// The prefix used for generated definitions.
+    #[structopt(short = "p", long = "prefix")]
+    prefix: Option<String>,
 }
 
 fn run(options: Options) -> Result<(), Box<dyn Error>> {
-    let src = read_to_string(options.input)?;
+    let src = read_to_string(&options.input)?;
     let expr: Expr = src.parse()?;
     let ty = expr.tyck()?;
-    let chunks = expr.compile()?;
+    let prefix = options
+        .prefix
+        .or(options
+            .input
+            .file_stem()
+            .map(|s| s.to_string_lossy().into_owned()))
+        .ok_or("Cannot determine prefix")?;
 
     let mut forth = format!("\\ expr = {}\n\\ type = {}\n", expr, ty);
     forth.extend(include_str!("prelude.f").chars());
-    forth.extend(itertools::join(chunks, " ").chars());
+    for decl in expr.compile(&prefix)? {
+        forth += &itertools::join(decl, " ");
+        forth.push('\n');
+    }
     println!("{}", forth);
 
     write(options.output, forth.as_bytes())?;

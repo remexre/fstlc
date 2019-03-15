@@ -21,10 +21,11 @@ mod tyck;
 pub use crate::ast::{Expr, Type};
 
 impl Expr {
-    /// Compiles an expression to a list of Forth words.
-    pub fn compile(&self) -> Result<Vec<String>, String> {
+    /// Compiles the expression to a sequence of Forth definitions. The names generated are prefixed
+    /// with the given string.
+    pub fn compile(&self, prefix: &str) -> Result<Vec<Vec<String>>, String> {
         let nameless = nameless::remove_names(&mut Vec::new(), self)?;
         let combinator = nameless.to_combinator();
-        unimplemented!("{}", combinator)
+        Ok(combinator.to_forth(prefix))
     }
 }
