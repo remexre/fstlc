@@ -14,3 +14,6 @@ structopt = "0.2.14"
 
 [build-dependencies]
 lalrpop = "0.16.3"
+
+[dev-dependencies]
+pretty_assertions = "0.6.1"
