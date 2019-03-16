@@ -19,12 +19,18 @@ mod tests;
 mod tyck;
 
 pub use crate::ast::{Expr, Type};
+pub(crate) use crate::nameless::remove_names;
+#[cfg(test)]
+pub(crate) use crate::{
+    cam::{eval::Combinator, StaticCombinator},
+    nameless::NamelessExpr,
+};
 
 impl Expr {
     /// Compiles the expression to a sequence of Forth definitions. The names generated are prefixed
     /// with the given string.
     pub fn compile(&self, prefix: &str) -> Result<Vec<Vec<String>>, String> {
-        let nameless = nameless::remove_names(&mut Vec::new(), self)?;
+        let nameless = remove_names(&mut Vec::new(), self)?;
         let combinator = nameless.to_combinator();
         Ok(combinator.to_forth(prefix))
     }

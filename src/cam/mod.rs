@@ -1,9 +1,11 @@
 //! Compiles the nameless lambda calculus to the Categorical Abstract Machine.
 
+pub(crate) mod eval;
+
 use crate::nameless::NamelessExpr;
 
 /// A combinator that is compiled to.
-#[derive(Debug, Display, PartialEq)]
+#[derive(Clone, Debug, Display, PartialEq)]
 pub enum StaticCombinator {
     /// The `App` combinator. `App(Λ(x)y, z) = x(y, z)`
     #[display(fmt = "App")]
