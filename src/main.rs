@@ -43,12 +43,12 @@ fn run(options: Options) -> Result<(), Box<dyn Error>> {
         .ok_or("Cannot determine prefix")?;
 
     let mut forth = format!("\\ expr = {}\n\\ type = {}\n", expr, ty);
-    forth.extend(include_str!("prelude.f").chars());
+    forth += include_str!("prelude.f");
+    forth.push('\n');
     for decl in expr.compile(&prefix)? {
         forth += &itertools::join(decl, " ");
         forth.push('\n');
     }
-    println!("{}", forth);
 
     write(options.output, forth.as_bytes())?;
     Ok(())

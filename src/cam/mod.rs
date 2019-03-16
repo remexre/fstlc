@@ -83,7 +83,7 @@ impl StaticCombinator {
                 let inner = b.compile_to_forth(hoisted, fresh_name);
                 let name = fresh_name();
                 hoisted.push((name.clone(), inner));
-                vec!["'".to_string(), name, "CFA".to_string()]
+                vec!["'".to_string(), name]
             }
             StaticCombinator::Pair(ref l, ref r) => {
                 let mut v = vec!["DUP".to_string()];

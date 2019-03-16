@@ -53,7 +53,6 @@ fn id_1337() {
                 "DUP",
                 "'",
                 "fstlc-lambda-test-0",
-                "CFA",
                 "SWAP",
                 "DROP",
                 "1337",
