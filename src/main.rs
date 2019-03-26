@@ -2,6 +2,7 @@ use fstlc::Expr;
 use std::{
     error::Error,
     fs::{read_to_string, write},
+    io::{stdout, Write},
     path::PathBuf,
     process::exit,
 };
@@ -23,7 +24,7 @@ struct Options {
 
     /// The output file.
     #[structopt(short = "o", long = "output", parse(from_os_str))]
-    output: PathBuf,
+    output: Option<PathBuf>,
 
     /// The prefix used for generated definitions.
     #[structopt(short = "p", long = "prefix")]
@@ -42,14 +43,18 @@ fn run(options: Options) -> Result<(), Box<dyn Error>> {
             .map(|s| s.to_string_lossy().into_owned()))
         .ok_or("Cannot determine prefix")?;
 
-    let mut forth = format!("\\ expr = {}\n\\ type = {}\n", expr, ty);
-    forth += include_str!("prelude.f");
+    let mut forth = include_str!("prelude.f").to_string();
     forth.push('\n');
+    forth += &format!("\\ expr = {}\n\\ type = {}\n", expr, ty);
     for decl in expr.compile(&prefix)? {
         forth += &itertools::join(decl, " ");
         forth.push('\n');
     }
 
-    write(options.output, forth.as_bytes())?;
+    if let Some(path) = options.output {
+        write(path, forth.as_bytes())?;
+    } else {
+        stdout().write_all(forth.as_bytes())?;
+    }
     Ok(())
 }
