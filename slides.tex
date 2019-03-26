@@ -1,9 +1,14 @@
 \documentclass{beamer}
+\usepackage{mathtools}
 \usetheme{Berlin}
 
 \def\S{\textbf{S}}
 \def\K{\textbf{K}}
 \def\I{\textbf{I}}
+\def\Y{\textbf{Y}}
+
+\newcommand{\DefineTerm}[2]{#1\Coloneqq&\ #2\\}
+\newcommand{\Case}[1]{\lvert\ &\ #1\\}
 
 \title{Compiling to the Categorical Abstract Machine}
 \author{Nathan Ringo}
@@ -17,23 +22,121 @@
 \begin{frame}
 	\frametitle{Combinators -- What?}
 	\begin{columns}[T]
-	\begin{column}[T]{5cm}
+		\column{0.45\textwidth}
 		\begin{itemize}
-			\item<1-> foo
-			\item<2-> SKI
-			\item<5-> Y, $\Omega$
+			\item<1-> Unnamed Representation
+			\item<2-> Y
+			\begin{itemize}
+				\item<3-> SKI
+				\item<6-> Turing Complete!
+			\end{itemize}
 		\end{itemize}
-	\end{column}
-	\begin{column}[T]{5cm}
+
+		\column{0.55\textwidth}
 		\begin{description}
-			\item<2->{$\S : x$}
-			\item<2->{$\S xyz = xz\left(yz\right)$}
-			\item<3->{$\S : x$}
-			\item<3->{$\S xyz = xz\left(yz\right)$}
-			\item<4->{$\S : x$}
-			\item<4->{$\S xyz = xz\left(yz\right)$}
+			\item<2->{$\Y x \rightarrow x (\Y x)$}
+			\item<3->{$\S xyz \rightarrow xz\left(yz\right)$}
+			\item<4->{$\K xy \rightarrow x$}
+			\item<5->{$\I x \rightarrow x$}
+			\item<6->{$\S\I\I x \rightarrow \I x\left(\I x\right)\rightarrow xx$}
 		\end{description}
-	\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Combinators -- Why?}
+	\begin{columns}[T]
+		\column{0.45\textwidth}
+		\begin{itemize}
+			\item<1-> Simple Semantics
+			\item<2-> Simple Machine Code
+			\item<2-> Peephole Optimization
+		\end{itemize}
+
+		\column{0.55\textwidth}
+		\only<2->{\includegraphics[width=2.5in]{slides/peephole-paper.png}}
+		\note{1989 paper}
+	\end{columns}
+\end{frame}
+
+\section{The CAM}
+
+\begin{frame}
+	\frametitle{The CAM}
+	\begin{itemize}[<+->]
+		\item Compiling functional languages
+		\item First-class environments
+		\item De Bruijn indices
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{De Bruijn Indices}
+	\begin{columns}[T]
+		\column{0.4\textwidth}
+		\textbf{Lambda Calculus}
+		\begin{align*}
+			\DefineTerm{e}{x}
+			\Case{\lambda x.\,e}
+			\Case{e_1 e_2}
+		\end{align*}
+
+		\only<3->{\textbf{With De Bruijn Indices}
+		\begin{align*}
+			\DefineTerm{e}{n}
+			\Case{\lambda e}
+			\Case{e_1 e_2}
+		\end{align*}}
+
+		\column{0.7\textwidth}
+		\begin{description}
+			\vspace{0.75cm}
+			\item<2->{$\left(\lambda x.\,x\right)\left(\lambda x.\,x\right)$}
+			\item<2->{$\lambda x.\,\lambda y.\,x$}
+			\item<2->{$\lambda f.\,\left(\lambda x.\,f\left(xx\right)\right)\left(\lambda x.\,f\left(xx\right)\right)$}
+			\vspace{1.75cm}
+			\item<4->{$\left(\lambda 0\right)\left(\lambda 0\right)$}
+			\item<4->{$\lambda\lambda 1$}
+			\item<4->{$\lambda\left(\lambda 1\left(00\right)\right)\left(\lambda 1\left(00\right)\right)$}
+		\end{description}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{The CAM}
+	\begin{itemize}[<+->]
+		\item Compiling functional languages
+		\item First-class environments
+		\item De Bruijn indices
+		\item ``Static'' and ``Dynamic'' Combinators
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{``Static'' Combinators}
+	\begin{columns}[T]
+		\column{0.19\textwidth}
+		\begin{itemize}
+			\item<1-> \texttt{Fst}
+			\item<1-> \texttt{Snd}
+			\item<2-> $\left<x\texttt{,}y\right>$
+			\item<3-> $x \circ y$
+			\item<4-> \texttt{\$}, $\Lambda\left(x\right)$
+			\item<5-> $'x$
+		\end{itemize}
+
+		\column{0.41\textwidth}
+		\begin{itemize}
+			\item<1-> $\texttt{Fst}\left(x\texttt{,}y\right)\rightarrow x$
+			\item<1-> $\texttt{Snd}\left(x\texttt{,}y\right)\rightarrow y$
+			\item<2-> $\left<x\texttt{,}y\right>z\rightarrow\left(xz\texttt{,}yz\right)$
+			\item<3-> $\left(x \circ y\right)z\rightarrow x\left(yz\right)$
+			\item<4-> $\texttt{\$}\left(\Lambda\left(x\right)y\texttt{,}z\right)\rightarrow x\left(y\texttt{,}z\right)$
+			\item<5-> $'xy = x$
+		\end{itemize}
+
+		\column{0.40\textwidth}
+		x
 	\end{columns}
 \end{frame}
 
