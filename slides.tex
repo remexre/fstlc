@@ -1,4 +1,4 @@
-\documentclass{beamer}
+\documentclass[draft]{beamer}
 \usepackage{mathtools}
 \usetheme{Berlin}
 
@@ -104,7 +104,7 @@
 
 \begin{frame}
 	\frametitle{The CAM}
-	\begin{itemize}[<+->]
+	\begin{itemize}
 		\item Compiling functional languages
 		\item First-class environments
 		\item De Bruijn indices
@@ -113,31 +113,54 @@
 \end{frame}
 
 \begin{frame}
-	\frametitle{``Static'' Combinators}
+	\frametitle{Combinators}
 	\begin{columns}[T]
-		\column{0.19\textwidth}
+		\column{0.24\textwidth}
+		``Dynamic''
 		\begin{itemize}
-			\item<1-> \texttt{Fst}
-			\item<1-> \texttt{Snd}
-			\item<2-> $\left<x\texttt{,}y\right>$
-			\item<3-> $x \circ y$
-			\item<4-> \texttt{\$}, $\Lambda\left(x\right)$
-			\item<5-> $'x$
+			\item<1-> Application
+			\item<2-> $\left(x\texttt{,}y\right)$
+		\end{itemize}
+		\only<3->{``Static''}
+		\begin{itemize}
+			\item<4-> \texttt{Fst}
+			\item<4-> \texttt{Snd}
+			\item<5-> $\left<x\texttt{,}y\right>$
+			\item<6-> $x \circ y$
+			\item<7-> \texttt{\$}, $\Lambda\left(x\right)$
+			\item<8-> $\texttt{'}x$
 		\end{itemize}
 
 		\column{0.41\textwidth}
+		\vspace{2.1cm}
 		\begin{itemize}
-			\item<1-> $\texttt{Fst}\left(x\texttt{,}y\right)\rightarrow x$
-			\item<1-> $\texttt{Snd}\left(x\texttt{,}y\right)\rightarrow y$
-			\item<2-> $\left<x\texttt{,}y\right>z\rightarrow\left(xz\texttt{,}yz\right)$
-			\item<3-> $\left(x \circ y\right)z\rightarrow x\left(yz\right)$
-			\item<4-> $\texttt{\$}\left(\Lambda\left(x\right)y\texttt{,}z\right)\rightarrow x\left(y\texttt{,}z\right)$
-			\item<5-> $'xy = x$
+			\item<4-> $\texttt{Fst}\left(x\texttt{,}y\right)\rightarrow x$
+			\item<4-> $\texttt{Snd}\left(x\texttt{,}y\right)\rightarrow y$
+			\item<5-> $\left<x\texttt{,}y\right>z\rightarrow\left(xz\texttt{,}yz\right)$
+			\item<6-> $\left(x \circ y\right)z\rightarrow x\left(yz\right)$
+			\item<7-> $\texttt{\$}\left(\Lambda\left(x\right)y\texttt{,}z\right)\rightarrow x\left(y\texttt{,}z\right)$
+			\item<8-> $\texttt{'}xy = x$
 		\end{itemize}
-
-		\column{0.40\textwidth}
-		x
 	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Compilation Rules}
+	\begin{itemize}[<+->]
+		\item $\texttt{compile (}e_1\ e_2\texttt{) = }\texttt{\$}\circ\left<\texttt{compile }e_1, \texttt{compile }e_2\right>$
+		\item $\texttt{compile (}\lambda e\texttt{) = }\Lambda\left(\texttt{compile }e\right)$
+		\item $\texttt{compile (\$0) = Snd}$
+		\item $\texttt{compile (\$(S\,}n\texttt{)) = compile (\$\,}n\texttt{)}\circ\texttt{Fst}$
+		\item $\texttt{compile (}c\texttt{) = '}c$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Example}
+	\begin{itemize}
+		\item<1-> Source: $\mathtt{print \left(\left(\lambda x:int.\ \lambda y:int.\ x\right)\ 0\ 1\right)}$
+		\item<2-> De Bruijn: $\mathtt{print \left(\left(\lambda\lambda\$1\right)\ 0\ 1\right)}$
+	\end{itemize}
 \end{frame}
 
 \end{document}

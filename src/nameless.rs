@@ -1,21 +1,26 @@
 use crate::Expr;
 
 /// A nameless expression.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Display, PartialEq)]
 pub enum NamelessExpr {
     /// Function application.
+    #[display(fmt = "({} {})", _0, _1)]
     App(Box<NamelessExpr>, Box<NamelessExpr>),
 
     /// Function abstraction.
+    #[display(fmt = "λ{}", _0)]
     Lam(Box<NamelessExpr>),
 
     /// A literal value.
+    #[display(fmt = "{}", _0)]
     Lit(u32),
 
     /// A globally named function.
+    #[display(fmt = "{}", _0)]
     Nam(String),
 
     /// A variable reference.
+    #[display(fmt = "${}", _0)]
     Var(usize),
 }
 

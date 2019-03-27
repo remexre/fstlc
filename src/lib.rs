@@ -6,6 +6,8 @@
 extern crate derive_more;
 #[macro_use]
 extern crate lalrpop_util;
+#[macro_use]
+extern crate log;
 #[cfg(test)]
 #[macro_use]
 extern crate pretty_assertions;
@@ -31,7 +33,9 @@ impl Expr {
     /// with the given string.
     pub fn compile(&self, prefix: &str) -> Result<Vec<Vec<String>>, String> {
         let nameless = remove_names(&mut Vec::new(), self)?;
+        info!("Nameless Representation: {}", nameless);
         let combinator = nameless.to_combinator();
+        info!("Combinators: {}", combinator);
         Ok(combinator.to_forth(prefix))
     }
 }

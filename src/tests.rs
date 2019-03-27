@@ -65,13 +65,13 @@ fn id_1337() {
 
     let combinator = Combinator::Apply(combinator.into(), Box::new(Combinator::Num(0)));
     let c = combinator.clone();
-    assert_eq!(c.to_string(), "((App ∘ <Λ(Snd),'1337>) 0)");
+    assert_eq!(c.to_string(), "((App ∘ <Λ(Snd), '1337>) 0)");
 
     let c = c.eval_step();
-    assert_eq!(c.to_string(), "(App (<Λ(Snd),'1337> 0))");
+    assert_eq!(c.to_string(), "(App (<Λ(Snd), '1337> 0))");
 
     let c = c.eval_step();
-    assert_eq!(c.to_string(), "(Snd (0,('1337 0)))");
+    assert_eq!(c.to_string(), "(Snd (0, ('1337 0)))");
 
     let c = c.eval_step();
     assert_eq!(c.to_string(), "1337");

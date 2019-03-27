@@ -10,6 +10,11 @@ use structopt::StructOpt;
 
 fn main() {
     let options = Options::from_args();
+    stderrlog::new()
+        .quiet(options.quiet)
+        .verbosity(options.verbose)
+        .init()
+        .unwrap();
     if let Err(err) = run(options) {
         eprintln!("{}", err);
         exit(1);
@@ -18,6 +23,14 @@ fn main() {
 
 #[derive(StructOpt)]
 struct Options {
+    /// Silence all output
+    #[structopt(short = "q", long = "quiet")]
+    quiet: bool,
+
+    /// Verbose mode (-v, -vv, -vvv, etc)
+    #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
+    verbose: usize,
+
     /// The input file.
     #[structopt(parse(from_os_str))]
     input: PathBuf,

@@ -17,7 +17,7 @@ pub enum Combinator {
     Com(Box<Combinator>, Box<Combinator>),
 
     /// The dynamic pair combinator, `(,)`.
-    #[display(fmt = "({},{})", _0, _1)]
+    #[display(fmt = "({}, {})", _0, _1)]
     DPair(Box<Combinator>, Box<Combinator>),
 
     /// The `Fst` combinator. `Fst(x, y) = x`
@@ -36,8 +36,8 @@ pub enum Combinator {
     #[display(fmt = "{}", _0)]
     Num(u32),
 
-    /// The `<,>` combinator. `<x,y>z = (xz,yz)`
-    #[display(fmt = "<{},{}>", _0, _1)]
+    /// The `<,>` combinator. `<x, y>z = (xz, yz)`
+    #[display(fmt = "<{}, {}>", _0, _1)]
     Pair(Box<Combinator>, Box<Combinator>),
 
     /// The `'` combinator. `'xy = x`
@@ -60,7 +60,7 @@ impl Combinator {
                     Combinator::Apply(ll, Box::new(Combinator::Apply(lr, Box::new(r)))) // (x∘y)z = x(yz)
                 }
                 (Combinator::Pair(ll, lr), r) => {
-                    // <x,y>z = (xz,yz)
+                    // <x, y>z = (xz, yz)
                     let r = Box::new(r);
                     Combinator::DPair(
                         Box::new(Combinator::Apply(ll, r.clone())),

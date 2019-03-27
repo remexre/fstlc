@@ -8,13 +8,13 @@ Name: String = <s:r"[a-zA-Z+*/-][a-zA-Z0-9+*/-]*"> => s.to_string();
 Num: u32 = <s:r"[0-9]+"> => u32::from_str(s).unwrap();
 
 pub Expr: Expr = {
-	<l:Expr> <r:Expr2> => Expr::App(Box::new(l), Box::new(r)),
+    "\\" <n:Name> ":" <t:Type> "." <e:Expr> => Expr::Lam(n, Arc::new(t), Box::new(e)),
+    "λ" <n:Name> ":" <t:Type> "." <e:Expr> => Expr::Lam(n, Arc::new(t), Box::new(e)),
 	<e:Expr2> => e,
 };
 
 Expr2: Expr = {
-    "\\" <n:Name> ":" <t:Type> "." <e:Expr2> => Expr::Lam(n, Arc::new(t), Box::new(e)),
-    "λ" <n:Name> ":" <t:Type> "." <e:Expr2> => Expr::Lam(n, Arc::new(t), Box::new(e)),
+	<l:Expr2> <r:Expr3> => Expr::App(Box::new(l), Box::new(r)),
 	<e:Expr3> => e,
 };
 

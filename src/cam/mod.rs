@@ -23,8 +23,8 @@ pub enum StaticCombinator {
     #[display(fmt = "Λ({})", _0)]
     Lam(Box<StaticCombinator>),
 
-    /// The `<,>` combinator. `<x,y>z = (xz,yz)`
-    #[display(fmt = "<{},{}>", _0, _1)]
+    /// The `<,>` combinator. `<x, y>z = (xz, yz)`
+    #[display(fmt = "<{}, {}>", _0, _1)]
     Pair(Box<StaticCombinator>, Box<StaticCombinator>),
 
     /// The `'` combinator, specialized to a name. `'xy = x`
