@@ -30,6 +30,6 @@ outdated-deps:
 
 compile-example NAME:
 	@mkdir -p target/examples
-	@just run examples/{{NAME}}.stlc -o target/examples/{{NAME}}.f
+	@just run compile examples/{{NAME}}.stlc -o target/examples/{{NAME}}.f
 run +ARGS="":
 	cargo run -- {{ARGS}}

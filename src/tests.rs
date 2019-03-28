@@ -1,4 +1,7 @@
-use crate::{remove_names, Combinator, Expr, NamelessExpr, StaticCombinator, Type};
+use crate::{
+    nameless::{remove_names, NamelessExpr},
+    DynamicCombinator, Expr, StaticCombinator, Type,
+};
 use std::sync::Arc;
 
 /// Compiles `id 1337`, checking the state through each step of the process.
@@ -63,7 +66,8 @@ fn id_1337() {
         ]
     );
 
-    let combinator = Combinator::Apply(combinator.into(), Box::new(Combinator::Num(0)));
+    let combinator =
+        DynamicCombinator::Apply(combinator.into(), Box::new(DynamicCombinator::Num(0)));
     let c = combinator.clone();
     assert_eq!(c.to_string(), "((App ∘ <Λ(Snd), '1337>) 0)");
 
@@ -75,9 +79,9 @@ fn id_1337() {
 
     let c = c.eval_step();
     assert_eq!(c.to_string(), "1337");
-    assert_eq!(c, Combinator::Num(1337));
+    assert_eq!(c, DynamicCombinator::Num(1337));
 
-    assert_eq!(combinator.eval(), Combinator::Num(1337));
+    assert_eq!(combinator.eval(), DynamicCombinator::Num(1337));
 }
 
 /// Compiles `const (id 42) 137`, checking the state through each step of the process.

@@ -2,7 +2,10 @@
 
 pub(crate) mod eval;
 
-use crate::nameless::NamelessExpr;
+use crate::{
+    ast::Expr,
+    nameless::{remove_names, NamelessExpr},
+};
 
 /// A combinator that is compiled to.
 #[derive(Clone, Debug, Display, PartialEq)]
@@ -99,6 +102,13 @@ impl StaticCombinator {
             StaticCombinator::QuoteNum(n) => vec!["DROP".to_string(), format!("{}", n)],
             StaticCombinator::Snd => vec!["FSTLC-SND".to_string()],
         }
+    }
+}
+
+impl Expr {
+    /// Compiles a `Expr` into a `StaticCombinator`.
+    pub fn to_combinators(&self) -> Result<StaticCombinator, String> {
+        remove_names(&mut Vec::new(), self).map(|nameless| nameless.to_combinator())
     }
 }
 
