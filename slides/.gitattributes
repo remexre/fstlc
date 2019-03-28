@@ -1,0 +1,2 @@
+cam-paper.png filter=lfs diff=lfs merge=lfs -text
+peephole-paper.png filter=lfs diff=lfs merge=lfs -text
