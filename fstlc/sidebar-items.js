@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["DynamicCombinator","A static or dynamic combinator. This representation is for implementing evaluation by term rewriting."],["Expr",""],["Type",""]]});
