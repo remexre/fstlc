@@ -1,4 +1,4 @@
-\documentclass[draft]{beamer}
+\documentclass[aspectratio=169, draft]{beamer}
 \usepackage{mathtools}
 \usetheme{Berlin}
 
@@ -65,7 +65,7 @@
 	\frametitle{The CAM}
 	\begin{itemize}[<+->]
 		\item Compiling functional languages
-		\item First-class environments
+		\item First-class environments as reversed LL
 		\item De Bruijn indices
 	\end{itemize}
 \end{frame}
@@ -80,7 +80,7 @@
 			\Case{\lambda x.\,e}
 			\Case{e_1 e_2}
 		\end{align*}
-
+		\vspace{-0.5cm}
 		\only<3->{\textbf{With De Bruijn Indices}
 		\begin{align*}
 			\DefineTerm{e}{n}
@@ -90,7 +90,7 @@
 
 		\column{0.7\textwidth}
 		\begin{description}
-			\vspace{0.75cm}
+			\vspace{0.25cm}
 			\item<2->{$\left(\lambda x.\,x\right)\left(\lambda x.\,x\right)$}
 			\item<2->{$\lambda x.\,\lambda y.\,x$}
 			\item<2->{$\lambda f.\,\left(\lambda x.\,f\left(xx\right)\right)\left(\lambda x.\,f\left(xx\right)\right)$}
@@ -106,7 +106,7 @@
 	\frametitle{The CAM}
 	\begin{itemize}
 		\item Compiling functional languages
-		\item First-class environments
+		\item First-class environments as reversed LL
 		\item De Bruijn indices
 		\item ``Static'' and ``Dynamic'' Combinators
 	\end{itemize}
@@ -153,13 +153,88 @@
 		\item $\texttt{compile (\$(S\,}n\texttt{)) = compile (\$\,}n\texttt{)}\circ\texttt{Fst}$
 		\item $\texttt{compile (}c\texttt{) = '}c$
 	\end{itemize}
+	\only<6->{Apply the program to any constant to run it}
+\end{frame}
+
+\def\App{\mathtt{\$}}
+\newcommand\Apply[2]{\left(#1\right)\left(#2\right)}
+\newcommand\Compose[2]{#1\circ#2}
+\newcommand\DPair[2]{\left(#1, #2\right)}
+\def\Fst{\mathtt{Fst}}
+\newcommand\Lam[1]{\Lambda\left(#1\right)}
+\newcommand\Pair[2]{\left<#1, #2\right>}
+\newcommand\Quote[1]{\texttt{'#1}}
+\def\Snd{\mathtt{Snd}}
+
+\begin{frame}
+	\frametitle{Compilation Example of $\mathtt{\left(\lambda x:int.\ \lambda y:int.\ x\right)\ 0\ 1}$}
+	\begin{itemize}[<+->]
+		\item Source: $\mathtt{\left(\lambda x:int.\ \lambda y:int.\ x\right)\ 0\ 1}$
+		\item De Bruijn: $\mathtt{\left(\lambda\lambda\$1\right)\ 0\ 1}$
+		\item CAM: $\Compose{\App}{\Pair{\Compose{\App}{\Pair{\Lam{\Lam{\Compose{\Snd}{\Fst}}}}{\Quote{0}}}}{\Quote{1}}}$
+	\end{itemize}
 \end{frame}
 
 \begin{frame}
-	\frametitle{Example}
-	\begin{itemize}
-		\item<1-> Source: $\mathtt{print \left(\left(\lambda x:int.\ \lambda y:int.\ x\right)\ 0\ 1\right)}$
-		\item<2-> De Bruijn: $\mathtt{print \left(\left(\lambda\lambda\$1\right)\ 0\ 1\right)}$
+	\frametitle{Runtime Example of $\Compose{\App}{\Pair{\Compose{\App}{\Pair{ \Lam{\Lam{\Compose{\Snd}{\Fst}}}}{\Quote{0}}}}{\Quote{1}}}$}
+	\begin{itemize}[<+->]
+		\item $\Apply{\Compose{\App}{\Pair{\Compose{\App}{\Pair{\Lam{\Lam{\Compose{\Snd}{\Fst}}}}{\Quote{0}}}}{\Quote{1}}}}{\Quote{e}}$
+		\item $\Apply{\App}{\Apply{\Pair{\Compose{\App}{\Pair{\Lam{\Lam{\Compose{\Snd}{\Fst}}}}{\Quote{0}}}}{\Quote{1}}}{\Quote{e}}}$
+		\item $\Apply{\App}{\DPair{
+			\Apply{\Compose{\App}{\Pair{\Lam{\Lam{\Compose{\Snd}{\Fst}}}}{\Quote{0}}}}{\Quote{e}}
+		}{\Apply{\Quote{1}}{\Quote{e}}}}$
+		\item $\Apply{\App}{\DPair{
+			\Apply{\Compose{\App}{\Pair{\Lam{\Lam{\Compose{\Snd}{\Fst}}}}{\Quote{0}}}}{\Quote{e}}
+		}{1}}$
+		\item $\Apply{\App}{\DPair{
+			\Apply{\App}{\Apply{
+				\Pair{\Lam{\Lam{\Compose{\Snd}{\Fst}}}
+			}{
+				\Quote{0}
+			}}{\Quote{e}}}
+		}{1}}$
+		\item $\Apply{\App}{\DPair{
+			\Apply{\App}{\DPair{
+				\Apply{\Lam{\Lam{\Compose{\Snd}{\Fst}}}}{\Quote{e}}
+			}{
+				\Apply{\Quote{0}}{\Quote{e}}
+			}}
+		}{1}}$
+		\item $\Apply{\App}{\DPair{
+			\Apply{\App}{\DPair{
+				\Apply{\Lam{\Lam{\Compose{\Snd}{\Fst}}}}{\Quote{e}}
+			}{0}}
+		}{1}}$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Runtime Example of $\Compose{\App}{\Pair{\Compose{\App}{\Pair{ \Lam{\Lam{\Compose{\Snd}{\Fst}}}}{\Quote{0}}}}{\Quote{1}}}$ (Pt. 2)}
+	\begin{itemize}[<+->]
+		\item $\Apply{\App}{\DPair{
+			\Apply{\App}{\DPair{
+				\Apply{\Lam{\Lam{\Compose{\Snd}{\Fst}}}}{\Quote{e}}
+			}{0}}
+		}{1}}$
+		\item $\Apply{\App}{\DPair{
+			\Apply{
+				\Lam{\Compose{\Snd}{\Fst}}
+			}{
+				\DPair{\Quote{e}}{0}
+			}
+		}{1}}$
+		\item $\Apply{\Compose{\Snd}{\Fst}}{\DPair{
+			\DPair{\Quote{e}}{0}
+		}{
+			1
+		}}$
+		\item $\Apply{\Snd}{\Apply{\Fst}{\DPair{
+			\DPair{\Quote{e}}{0}
+		}{
+			1
+		}}}$
+		\item $\Apply{\Snd}{\DPair{\Quote{e}}{0}}$
+		\item $0$
 	\end{itemize}
 \end{frame}
 
